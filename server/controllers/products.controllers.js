@@ -1,91 +1,80 @@
-const Product = require('../models/products.models');
+const mongoose = require('mongoose');
+const Product = require('../models/products.models.js');
 
-exports.getAllProducts = (req, res, next) => {
-  Product.find().then(
-    (products) => {
-      const mappedProducts = products.map((product) => {
-        product.imageUrl = req.protocol + '://' + req.get('host') + '/images/' + product.imageUrl;
-        return product;
-      });
-      res.status(200).json(mappedProducts);
+const create_product = (req, res) => {
+  const newProduct = new Product({
+    name: req.body.name,
+    description: req.body.description,
+    category: req.body.category,
+    price: req.body.price,
+    image: req.body.image,
+  });
+
+  newProduct.save((err, product) => {
+    if (err) {
+      res.status(500).send({ error: err.message });
+    } else {
+      res.status(201).send({ product });
     }
-  ).catch(
-    () => {
-      res.status(500).send(new Error('Database error!'));
-    }
-  );
+  });
 };
 
-exports.getOneProduct = (req, res, next) => {
-  Product.findById(req.params.id).then(
-    (product) => {
-      if (!product) {
-        return res.status(404).send(new Error('Product not found!'));
+const get_all_products = (req, res) => {
+  Product.find({}, (err, products) => {
+    if (err) {
+      res.status(500).send({ error: err.message });
+    } else {
+      res.status(200).send({ products });
+    }
+  });
+};
+
+const get_product_by_id = (req, res) => {
+  Product.findById(req.params.id, (err, product) => {
+    if (err) {
+      if (err.kind === 'ObjectId') {
+        res.status(404).send({ message: 'Product not found' });
+      } else {
+        res.status(500).send({ error: err.message });
       }
-      product.imageUrl = req.protocol + '://' + req.get('host') + '/images/' + product.imageUrl;
-      res.status(200).json(product);
+    } else {
+      res.status(200).send({ product });
     }
-  ).catch(
-    () => {
-      res.status(500).send(new Error('Database error!'));
-    }
-  )
+  });
 };
 
-/**
- *
- * Expects request to contain:
- * contact: {
- *   firstName: string,
- *   lastName: string,
- *   address: string,
- *   city: string,
- *   email: string
- * }
- * products: [string] <-- array of product _id
- *
- */
-exports.orderProducts = (req, res, next) => {
-  if (!req.body.contact ||
-      !req.body.contact.firstName ||
-      !req.body.contact.lastName ||
-      !req.body.contact.address ||
-      !req.body.contact.city ||
-      !req.body.contact.email ||
-      !req.body.products) {
-    return res.status(400).send(new Error('Bad request!'));
-  }
-  let queries = [];
-  for (let productId of req.body.products) {
-    const queryPromise = new Promise((resolve, reject) => {
-      Product.findById(productId).then(
-        (product) => {
-          if (!product) {
-            reject('Product not found: ' + productId);
-          }
-          product.imageUrl = req.protocol + '://' + req.get('host') + '/images/' + product.imageUrl;
-          resolve(product);
-        }
-      ).catch(
-        () => {
-          reject('Database error!');
-        }
-      )
-    });
-    queries.push(queryPromise);
-  }
-  Promise.all(queries).then(
-    (products) => {
-      const orderId = uuid();
-      return res.status(201).json({
-        contact: req.body.contact,
-        products: products,
-        orderId: orderId
-      })
+const update_product = (req, res) => {
+  Product.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, product) => {
+    if (err) {
+      if (err.kind === 'ObjectId') {
+        res.status(404).send({ message: 'Product not found' });
+      } else {
+        res.status(500).send({ error: err.message });
+      }
+    } else {
+      res.status(200).send({ product });
     }
-  ).catch(
-    (error) => {
-      return res.status(500).json(new Error(error));
+  });
+};
+
+const delete_product = (req, res) => {
+  Product.findByIdAndDelete(req.params.id, (err, product) => {
+    if (err) {
+      if (err.kind === 'ObjectId') {
+        res.status(404).send({ message: 'Product not found' });
+      } else {
+        res.status(500).send({ error: err.message });
+      }
+    } else {
+      res.status(200).send({ message: 'Product deleted successfully' });
     }
-  );
+  });
+};
+
+module.exports = {
+  create_product,
+  get_all_products,
+  get_product_by_id,
+  update_product,
+  delete_product,
 };

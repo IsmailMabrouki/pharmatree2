@@ -1,12 +1,15 @@
-// Product.js
-import React from "react";
+// Product.jsx
+import React from 'react';
+import "../styles/Featured.css";
 
-const Product = ({ interactions, title, desc }) => {
+const Product = ({ name, description, category, price, image }) => {
   return (
     <div className="product">
-      <h3>{title}</h3>
-      <p>{desc}</p>
-      <p>Interactions: {interactions}</p>
+      <h2>{name}</h2>
+      <p>{description}</p>
+      <p>Category: {category}</p>
+      <p>Price: ${price}</p>
+      <img src={image} alt={`${name} Image`} width="100" />
     </div>
   );
 };

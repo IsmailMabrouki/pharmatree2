@@ -11,8 +11,8 @@ function Navbar({ user }) {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container-fluid">
-        <Link className="navbar-brand" to="#">
-          MERN Profile
+        <Link className="navbar-brand" to="/welcome">
+          Pharmatree
         </Link>
         <button
           className="navbar-toggler"
@@ -28,11 +28,21 @@ function Navbar({ user }) {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             {user.role === "ADMIN" ? (
-              <li className="nav-item">
+              <><li className="nav-item">
                 <Link className="nav-link active" aria-current="page" to="/admin">
                   Admin
                 </Link>
-              </li>
+              </li><li className="nav-item">
+                  <Link className="nav-link active" aria-current="page" to="/Products">
+                    Products
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link active" aria-current="page" to="/ProductForm">
+                   Add Product
+                  </Link>
+                </li>
+                </>
             ) : (
               ""
             )}

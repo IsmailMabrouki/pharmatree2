@@ -11,7 +11,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Admin from './pages/Admin';
 import Navbar from './components/Navbar';
+import Product from './components/Product';
 import NotFound from './pages/NotFound';
+import Products from './pages/Products';
 import NoAccess from './pages/NoAccess';
 import PrivateRouter from './components/PrivateRouter';
 import AdminRouter from './components/AdminRouter';
@@ -21,6 +23,7 @@ import jwt_decode from 'jwt-decode'
 import { Logout, setUser } from './redux/actions/authActions';
 import { useSelector } from 'react-redux';
 import { setAuth } from './util/setAuth';
+import ProductForm from './pages/ProductForm';
 
  if(window.localStorage.jwt){
    const decode = jwt_decode(window.localStorage.jwt)
@@ -46,10 +49,16 @@ function App() {
      <Navbar user={user}/>
     <Routes>
           <Route path="/welcome" element={<Welcome />} />
-
+          <Route path="/products/:productId" element={<Product />} />
+          <Route path="/products" element={<Products />} />
           <Route path="/" element={
           <PrivateRouter user={user}>
             <Profile />
+          </PrivateRouter>
+        } />
+        <Route path="/Products" element={
+          <PrivateRouter user={user}>
+            <Products />
           </PrivateRouter>
         } />
           <Route path="/login" element={
@@ -65,6 +74,16 @@ function App() {
           <Route path="/admin" element={
           <AdminRouter user={user}>
             <Admin />
+          </AdminRouter>
+        } />
+        <Route path="/Products" element={
+          <AdminRouter user={user}>
+            <Products />
+          </AdminRouter>
+        } />
+         <Route path="/ProductForm" element={
+          <AdminRouter user={user}>
+            <ProductForm />
           </AdminRouter>
         } />
           <Route path="*" element={<NotFound />} />

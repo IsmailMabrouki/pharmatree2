@@ -1,3 +1,4 @@
+// productAction.js
 import {
   FETCH_MEDICINE_PRODUCTS_REQUEST,
   FETCH_MEDICINE_PRODUCTS_SUCCESS,
@@ -11,24 +12,28 @@ export const fetchMedicineProductsRequest = () => ({
 
 export const fetchMedicineProductsSuccess = (data) => ({
   type: FETCH_MEDICINE_PRODUCTS_SUCCESS,
-  data,
+  payload: data,
 });
 
 export const fetchMedicineProductsFailure = (error) => ({
   type: FETCH_MEDICINE_PRODUCTS_FAILURE,
-  error,
+  payload: error,
 });
 
 export const fetchMedicineProducts = () => async (dispatch) => {
+  console.log("Action: fetchMedicineProductsRequest");
   dispatch(fetchMedicineProductsRequest());
-
   try {
-    // Perform an API request here using Axios
-    const response = await axios.get('http://localhost:3600/api/products/');
-    const data = response.data;
+    const response = await axios.get('http://localhost:3600/api/products');
+    console.log("Action: Successful response", response.data);
 
-    dispatch(fetchMedicineProductsSuccess(data));
+    if (response.status !== 200) {
+      throw new Error('Error!');
+    }
+
+    dispatch(fetchMedicineProductsSuccess(response.data));
   } catch (error) {
+    console.log("Action: Error", error.message);
     dispatch(fetchMedicineProductsFailure(error.message));
   }
 };
